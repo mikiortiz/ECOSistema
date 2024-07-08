@@ -1,10 +1,9 @@
 import React from 'react';
-import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
-import SwipeableViews from 'react-swipeable-views-react-18-fix';
+import Slider from 'react-slick';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import { KeyboardArrowLeft, KeyboardArrowRight } from '@mui/icons-material';
 
 interface Image {
   imgPath: string;
@@ -14,21 +13,62 @@ interface CarruselProps {
   images: Image[];
 }
 
+const NextArrow = (props: any) => {
+  const { className, style, onClick } = props;
+  return (
+    <div
+      className={className}
+      style={{
+        ...style,
+        display: 'block',
+        background: 'rgba(250, 250, 250, 0.2)',
+        borderRadius: '50%',
+        right: 10,
+        zIndex: 1,
+      }}
+      onClick={onClick}
+    >
+      <KeyboardArrowRight />
+    </div>
+  );
+};
+
+const PrevArrow = (props: any) => {
+  const { className, style, onClick } = props;
+  return (
+    <div
+      className={className}
+      style={{
+        ...style,
+        display: 'block',
+        background: 'rgba(250, 250, 250, 0.2)',
+        borderRadius: '50%',
+        left: 10,
+        zIndex: 1,
+      }}
+      onClick={onClick}
+    >
+      <KeyboardArrowLeft />
+    </div>
+  );
+};
+
 const Carrusel: React.FC<CarruselProps> = ({ images }) => {
-  const theme = useTheme();
   const [activeStep, setActiveStep] = React.useState(0);
-  const maxSteps = images.length;
 
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  const handleStepChange = (index: number) => {
+    setActiveStep(index);
   };
 
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
-  const handleStepChange = (step: number) => {
-    setActiveStep(step);
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    beforeChange: (_current: number, next: number) => handleStepChange(next),
+    nextArrow: <NextArrow />,
+    prevArrow: <PrevArrow />,
   };
 
   return (
@@ -42,62 +82,25 @@ const Carrusel: React.FC<CarruselProps> = ({ images }) => {
           margin: '0 auto',
         }}
       >
-        <SwipeableViews
-          axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-          index={activeStep}
-          onChangeIndex={handleStepChange}
-          enableMouseEvents
-        >
+        <Slider {...settings}>
           {images.map((step, index) => (
             <div key={index}>
-              {Math.abs(activeStep - index) <= 2 ? (
-                <Box
-                  component="img"
-                  sx={{
-                    height: 140,
-                    display: 'block',
-                    maxWidth: 345,
-                    overflow: 'hidden',
-                    width: '100%',
-                    objectFit: 'cover',
-                  }}
-                  src={step.imgPath}
-                  alt={`Image ${index + 1}`}
-                />
-              ) : null}
+              <Box
+                component="img"
+                sx={{
+                  height: 140,
+                  display: 'block',
+                  maxWidth: 345,
+                  overflow: 'hidden',
+                  width: '100%',
+                  objectFit: 'cover',
+                }}
+                src={step.imgPath}
+                alt={`Image ${index + 1}`}
+              />
             </div>
           ))}
-        </SwipeableViews>
-        <Button
-          size="small"
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: 8,
-            transform: 'translateY(-50%)',
-            minWidth: 'auto',
-            backgroundColor: 'rgba(250, 250, 250, 0.2)',
-          }}
-          onClick={handleBack}
-          disabled={activeStep === 0}
-        >
-          <KeyboardArrowLeft />
-        </Button>
-        <Button
-          size="small"
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            right: 8,
-            transform: 'translateY(-50%)',
-            minWidth: 'auto',
-            backgroundColor: 'rgba(250, 250, 250, 0.2)',
-          }}
-          onClick={handleNext}
-          disabled={activeStep === maxSteps - 1}
-        >
-          <KeyboardArrowRight />
-        </Button>
+        </Slider>
       </Box>
       <Box
         sx={{
